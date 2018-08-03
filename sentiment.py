@@ -1,8 +1,6 @@
 import pandas as pd
 
 # read data
-vix = pd.read_csv("^VIX.csv")
-tnx = pd.read_csv("^TNX.csv")
 aaii = pd.read_csv("AAII-AAII_SENTIMENT.csv")
 vix = pd.read_csv("^VIX.csv")
 tnx = pd.read_csv("^TNX.csv")
@@ -37,7 +35,7 @@ for i in range(len(closes)-1):
     else:
         trend.append(0)
 trend.append(1)
-aaii.insert(loc=8, column="Trend", value=trend)
+aaii.insert(loc=len(aaii.columns), column="Trend", value=trend)
 
 # training and testing data
 x = aaii.drop(columns=["S&P 500 Weekly Close"], axis=1)
@@ -57,7 +55,11 @@ for state in [22, 63, 93]:
 print("Accuracy for test set: {}".format(model.score(X_test, y_test)))
 print("Accuracy for train set: {}".format(model.score(X_train, y_train)))
 model.coef_
-#aaii.to_excel("AAII.xlsx", index=False)
+cols = list(aaii.columns)
+index = cols.index("S&P 500 Weekly Close")
+cols = cols[:index] + cols[index+1:] + [cols[index]]
+aaii = aaii[cols]
+aaii.to_excel("AAII.xlsx", index=False)
 
 # run metrics testing
 from sklearn.metrics import f1_score
